@@ -51,13 +51,13 @@ public class LBlock extends BlockObject {
 
 	private final String	TAG							= this.getClass().getSimpleName();
 	static float mVertexCoords[] = { 
-		    -0.25f, 0.75f, 0.0f, // left top
-			0.0f, 0.75f, 0.0f, // center top
-			-0.25f, 0.25f, 0.0f, // Center left
-			-0.25f, 0.0f, 0.0f, // left bottom
-			0.25f, 0.0f, 0.0f,// right bottom
-			0.25f, 0.25f, 0.0f,// right top
-			0.0f, 0.25f, 0.0f,// center middle
+		    -0.25f, 0.375f, 0.0f, // left top
+			0.0f, 0.375f, 0.0f, // center top
+			-0.25f, -0.125f, 0.0f, // Center left
+			-0.25f, -0.375f, 0.0f, // left bottom
+			0.25f, -0.375f, 0.0f,// right bottom
+			0.25f, -0.125f, 0.0f,// right top
+			0.0f, -0.125f, 0.0f,// center middle
 	};
 
 	final short mDrawOrder[] = { 0, 1, 2, 6, 3, 4, 6, 5 };

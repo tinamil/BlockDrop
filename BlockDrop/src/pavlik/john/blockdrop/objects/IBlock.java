@@ -38,10 +38,11 @@ public class IBlock extends BlockObject {
 														};
 
 	private final String	TAG							= this.getClass().getSimpleName();
-	static float			mLineCoords[]				= { 0f, .5f, 0.0f, // top left
-			0f, -.5f, 0.0f, // bottom left
-			.25f, -.5f, 0.0f, // bottom right
-			.25f, .5f, 0.0f							};									// top
+	static float			mLineCoords[]				= { 
+		    -0.125f,  0.5f, 0.0f, // top left
+		    -0.125f, -0.5f, 0.0f, // bottom left
+			 0.125f, -0.5f, 0.0f, // bottom right
+			 0.125f,  0.5f, 0.0f							};									// top
 																							// right
 
 	private final short		mDrawOrder[]				= { 0, 2, 3, 0, 1, 2 };			// order

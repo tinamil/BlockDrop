@@ -53,14 +53,14 @@ public class SBlock extends BlockObject {
 	private final String	TAG							= this.getClass().getSimpleName();
 	static float			mVertexCoords[]				= {
 														// Vertex coordinates
-			0.00f, -0.25f, 0.0f,// left bottom (0)
-			0.00f, 0.00f, 0.0f,// left middle (1)
-			0.25f, 0.00f, 0.0f,// center-left middle (2)
-			0.25f, 0.25f, 0.0f,// center-left top (3)
-			0.75f, 0.25f, 0.0f, // right top (4)
-			0.75f, 0.00f, 0.0f,// right middle (5)
-			0.50f, 0.00f, 0.0f, // Center-right middle (6)
-			0.50f, -0.25f, 0.0f, // center-right bottom (7)
+			-0.375f, -0.25f, 0.0f,// left bottom (0)
+			-0.375f, 0.00f, 0.0f,// left middle (1)
+			-0.125f, 0.00f, 0.0f,// center-left middle (2)
+			-0.125f, 0.25f, 0.0f,// center-left top (3)
+			0.375f, 0.25f, 0.0f, // right top (4)
+			0.375f, 0.00f, 0.0f,// right middle (5)
+			0.025f, 0.00f, 0.0f, // Center-right middle (6)
+			0.025f, -0.25f, 0.0f, // center-right bottom (7)
 														};
 
 	final short				mDrawOrder[]				= { 1, 0, 2, 7, 6, 2, 3, 5, 4 };

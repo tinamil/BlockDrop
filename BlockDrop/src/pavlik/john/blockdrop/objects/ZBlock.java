@@ -54,14 +54,14 @@ public class ZBlock extends BlockObject {
 	
 	static float				mVertexCoords[]				= {
 															// Vertex coordinates
-			0.75f,  -0.25f, 0.0f,// right bottom (0)
-			0.75f,   0.00f, 0.0f,// right middle (1)
-			0.50f,  0.00f, 0.0f,// center-right middle (2)
-			0.50f,  0.25f, 0.0f,// center-right top (3)
-			0.00f,  0.25f, 0.0f, // left top (4)
-			0.00f,  0.00f, 0.0f,// left middle (5)
-			0.25f,  0.00f, 0.0f, // Center-left middle (6)
-			0.25f, -0.25f, 0.0f, // center-left bottom (7)
+			0.375f,  -0.25f, 0.0f,// right bottom (0)
+			0.375f,   0.00f, 0.0f,// right middle (1)
+			0.025f,  0.00f, 0.0f,// center-right middle (2)
+			0.025f,  0.25f, 0.0f,// center-right top (3)
+			-0.375f,  0.25f, 0.0f, // left top (4)
+			-0.375f,  0.00f, 0.0f,// left middle (5)
+			-0.125f,  0.00f, 0.0f, // Center-left middle (6)
+			-0.125f, -0.25f, 0.0f, // center-left bottom (7)
 															};
 
 	final short					mDrawOrder[]				= { 1, 0, 2, 7, 6, 2, 3, 5, 4 };
