@@ -23,8 +23,6 @@ public class MyRenderer implements Renderer {
 	private final float[]		mViewMatrix			= new float[16];
 	private Context				mContext;
 
-	List<Line>					lines				= new ArrayList<Line>();
-
 	public MyRenderer(Context context) {
 		this.mContext = context;
 	}
@@ -35,39 +33,6 @@ public class MyRenderer implements Renderer {
 		for (BlockObject object : mObjects) {
 			object.regenChild();
 		}
-
-		Line eastHorz = new Line();
-		eastHorz.SetVerts(1f, 1f, 0f, 1f, -1f, 0f);
-		eastHorz.SetColor(.8f, .8f, 0f, 1.0f);
-		Line east2Horz = new Line();
-		east2Horz.SetVerts(2f, 2f, 0f, 2f, -2f, 0f);
-		east2Horz.SetColor(.8f, .8f, 0f, 1.0f);
-		Line northHorz = new Line();
-		northHorz.SetVerts(-1f, 1f, 0f, 1f, 1f, 0f);
-		northHorz.SetColor(0.8f, 0.8f, 0f, 1.0f);
-		Line northHorz2 = new Line();
-		northHorz2.SetVerts(-2f, 2f, 0f, 2f, 2f, 0f);
-		northHorz2.SetColor(0.8f, 0.8f, 0f, 1.0f);
-		Line westHorz = new Line();
-		westHorz.SetVerts(-1f, -1f, 0f, -1f, 1f, 0f);
-		westHorz.SetColor(0.8f, 0.8f, 0f, 1.0f);
-		Line westHorz2 = new Line();
-		westHorz2.SetVerts(-2f, -2f, 0f, -2f, 2f, 0f);
-		westHorz2.SetColor(0.8f, 0.8f, 0f, 1.0f);
-		Line southHorz = new Line();
-		southHorz.SetVerts(-1f, -1f, 0f, 1f, -1f, 0f);
-		southHorz.SetColor(0.8f, 0.8f, 0f, 1.0f);
-		Line southHorz2 = new Line();
-		southHorz2.SetVerts(-2f, -2f, 0f, 2f, -2f, 0f);
-		southHorz2.SetColor(0.8f, 0.8f, 0f, 1.0f);
-		lines.add(eastHorz);
-		lines.add(east2Horz);
-		lines.add(northHorz);
-		lines.add(northHorz2);
-		lines.add(westHorz);
-		lines.add(westHorz2);
-		lines.add(southHorz);
-		lines.add(southHorz2);
 	}
 
 	public void onDrawFrame(GL10 unused) {
@@ -82,10 +47,6 @@ public class MyRenderer implements Renderer {
 		for (BlockObject obj : mObjects) {
 			obj.draw(mViewMatrix, mProjectionMatrix);
 		}
-		for (Line line : lines) {
-			line.draw(mMVPMatrix);
-		}
-
 	}
 
 	public void onSurfaceChanged(GL10 unused, int width, int height) {
