@@ -33,7 +33,7 @@ public class MyRenderer implements Renderer {
 		// Set the background frame color
 		GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 		for (BlockObject object : mObjects) {
-			object.regen();
+			object.regenChild();
 		}
 
 		Line eastHorz = new Line();
@@ -74,7 +74,7 @@ public class MyRenderer implements Renderer {
 		// Redraw background color
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-		Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+		Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
 		// Calculate the projection and view transformation
 		//Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
@@ -95,7 +95,7 @@ public class MyRenderer implements Renderer {
 
 		// this projection matrix is applied to object coordinates
 		// in the onDrawFrame() method
-		Matrix.orthoM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 1f, 10f);
+		Matrix.orthoM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1f, 10f);
 	}
 
 	/**
@@ -120,6 +120,7 @@ public class MyRenderer implements Renderer {
 	}
 
 	public void addBlock(BlockObject block) {
+		block.regenChild();
 		mObjects.add(block);
 	}
 

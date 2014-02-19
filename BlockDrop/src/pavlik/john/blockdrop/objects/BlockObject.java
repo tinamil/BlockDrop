@@ -22,7 +22,12 @@ public abstract class BlockObject {
 	protected final int			mBytesPerFloat		= 4;
 	/** How many bytes per short. */
 	protected final int			mBytesPerShort		= 2;
+
 	private transient int		mRotationAngle		= 0;
+	private float				xCoordinate			= 0;
+	private float				yCoordinate			= 0;
+
+	private boolean				initialized			= false;
 
 	// number of coordinates per vertex in this array
 	protected static final int	COORDS_PER_VERTEX	= 3;
@@ -31,6 +36,14 @@ public abstract class BlockObject {
 
 	public BlockObject(Context mContext) {
 		this.mContext = mContext;
+	}
+
+	public synchronized void setXCoordinate(float xCoordinate) {
+		this.xCoordinate = xCoordinate;
+	}
+
+	public synchronized void setYCoordinate(float yCoordinate) {
+		this.yCoordinate = yCoordinate;
 	}
 
 	protected FloatBuffer initializeFloatBuffer(float[] data) {
@@ -45,7 +58,6 @@ public abstract class BlockObject {
 	}
 
 	protected ShortBuffer initializeShortBuffer(short[] data) {
-
 		ByteBuffer bb = ByteBuffer.allocateDirect(
 		// (# of coordinate values * 2 bytes per short)
 				data.length * mBytesPerShort);
@@ -56,11 +68,18 @@ public abstract class BlockObject {
 		return returnValue;
 	}
 
-	protected void draw(float[] viewMatrix, float[] projectionMatrix, int mTextureCoordinateDataSize,
-			FloatBuffer mTextureCoordinates, int mTextureDataHandle, FloatBuffer vertexBuffer,
-			ShortBuffer drawListBuffer, int drawListBufferSize, int drawType) {
+	protected void draw(float[] viewMatrix, float[] projectionMatrix,
+			int mTextureCoordinateDataSize, FloatBuffer mTextureCoordinates,
+			int mTextureDataHandle, FloatBuffer vertexBuffer, ShortBuffer drawListBuffer,
+			int drawListBufferSize, int drawType) {
+
+		if(!initialized){
+			regenChild();
+		}
+		
 		// Add program to OpenGL environment
 		GLES20.glUseProgram(mProgram);
+		MyRenderer.checkGlError("glUseProgram");
 
 		float[] mModelMatrix = new float[16];
 		Matrix.setIdentityM(mModelMatrix, 0);
@@ -78,7 +97,7 @@ public abstract class BlockObject {
 		// Set the correct translation for the object
 		float[] translationMatrix = new float[16];
 		Matrix.setIdentityM(translationMatrix, 0);
-		Matrix.translateM(translationMatrix, 0, 0f, 0f, 0f);
+		Matrix.translateM(translationMatrix, 0, xCoordinate, yCoordinate, 0f);
 		Matrix.multiplyMM(scratch2, 0, translationMatrix, 0, scratch, 0);
 
 		// Set the correct rotation for the object
@@ -87,17 +106,17 @@ public abstract class BlockObject {
 		Matrix.rotateM(rotationMatrix, 0, mRotationAngle, 0f, 0f, 1f);
 		Matrix.multiplyMM(mModelMatrix, 0, rotationMatrix, 0, scratch2, 0);
 
-
 		float[] mMVPMatrix = new float[16];
-		// This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-        // (which currently contains model * view).
-        Matrix.multiplyMM(mMVPMatrix, 0, viewMatrix, 0, mModelMatrix, 0);   
-        
-        // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-        // (which now contains model * view * projection).
-        Matrix.multiplyMM(mMVPMatrix, 0, projectionMatrix, 0, mMVPMatrix, 0);
+		// This multiplies the view matrix by the model matrix, and stores the result in the MVP
+		// matrix
+		// (which currently contains model * view).
+		Matrix.multiplyMM(mMVPMatrix, 0, viewMatrix, 0, mModelMatrix, 0);
 
-		
+		// This multiplies the modelview matrix by the projection matrix, and stores the result in
+		// the MVP matrix
+		// (which now contains model * view * projection).
+		Matrix.multiplyMM(mMVPMatrix, 0, projectionMatrix, 0, mMVPMatrix, 0);
+
 		// get handle to shape's transformation matrix
 		int mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
 		MyRenderer.checkGlError("glGetUniformLocation");
@@ -150,15 +169,15 @@ public abstract class BlockObject {
 
 	public abstract void draw(float[] viewMatrix, float[] projectionMatrix);
 
-	public void setRotation(int degrees) {
+	public synchronized void setRotation(int degrees) {
 		mRotationAngle = degrees;
 	}
 
-	public void setLocation(int x, int y) {
+	public abstract void regenChild();
 
-	}
-
-	public void regen() {
+	protected void regen() {
+		Log.i(TAG, "Regenerating block textures and data");
+		initialized = true;
 		// prepare shaders and OpenGL program
 		int vertexShader = Util.compileShader(GLES20.GL_VERTEX_SHADER, Util
 				.readTextFileFromRawResource(mContext, R.raw.vertshader));

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import pavlik.john.blockdrop.opengl.MyRenderer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +20,7 @@ public class Util {
 		final int[] textureHandle = new int[1];
 
 		GLES20.glGenTextures(1, textureHandle, 0);
+		MyRenderer.checkGlError("glGenTextures");
 
 		if (textureHandle[0] != 0) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -30,19 +32,25 @@ public class Util {
 
 			// Bind to the texture in OpenGL
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
+			MyRenderer.checkGlError("glBindTexture");
 
 			// Set filtering
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
 					GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+			MyRenderer.checkGlError("glTexParameteri");
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
 					GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+			MyRenderer.checkGlError("glTexParameteri");
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
 					GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+			MyRenderer.checkGlError("glTexParameteri");
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
 					GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+			MyRenderer.checkGlError("glTexParameteri");
 
 			// Load the bitmap into the bound texture.
 			GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+			MyRenderer.checkGlError("texImage2D");
 
 			// Recycle the bitmap, since its data has been loaded into OpenGL.
 			bitmap.recycle();
@@ -91,18 +99,22 @@ public class Util {
 	public static int compileShader(final int shaderType,
 			final String shaderSource) {
 		int shaderHandle = GLES20.glCreateShader(shaderType);
+		MyRenderer.checkGlError("glCreateShader");
 
 		if (shaderHandle != 0) {
 			// Pass in the shader source.
 			GLES20.glShaderSource(shaderHandle, shaderSource);
+			MyRenderer.checkGlError("glShaderSource");
 
 			// Compile the shader.
 			GLES20.glCompileShader(shaderHandle);
+			MyRenderer.checkGlError("glCompileShader");
 
 			// Get the compilation status.
 			final int[] compileStatus = new int[1];
 			GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS,
 					compileStatus, 0);
+			MyRenderer.checkGlError("glGetShaderiv");
 
 			// If the compilation failed, delete the shader.
 			if (compileStatus[0] == 0) {
@@ -110,6 +122,7 @@ public class Util {
 						"Error compiling shader: "
 								+ GLES20.glGetShaderInfoLog(shaderHandle));
 				GLES20.glDeleteShader(shaderHandle);
+				MyRenderer.checkGlError("glDeleteShader");
 				shaderHandle = 0;
 			}
 		}

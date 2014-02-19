@@ -1,6 +1,6 @@
 package pavlik.john.blockdrop.opengl;
 
-import pavlik.john.blockdrop.objects.TBlock;
+import pavlik.john.blockdrop.objects.BlockObject;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
@@ -9,15 +9,9 @@ import android.view.MotionEvent;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
-	private static final int	worldWidth		= 10;
-	private static final int	worldHeight		= 22;
-
 	private static final String	TAG				= "MyGLSurfaceView";
-	private float				mPreviousX, mPreviousY;
 
 	private MyRenderer			mRenderer;
-	TBlock						block;
-	private int					lastRotation	= 0;
 
 	public MyGLSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -31,10 +25,21 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		setRenderer(mRenderer);
 
 		// Render the view only when there is a change in the drawing data.
-		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-		
-		block = new TBlock(context);
-		mRenderer.addBlock(block);
+		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+	}
+
+	BlockObject	blockTest;
+
+	public void addBlock(final BlockObject block) {
+		blockTest = block;
+		queueEvent(new Runnable() {
+
+			@Override
+			public void run() {
+				mRenderer.addBlock(block);
+			}
+		});
+
 	}
 
 	@Override
@@ -43,33 +48,26 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		// and other input controls. In this case, you are only
 		// interested in events where the touch position changed.
 
-		float x = e.getX();
-		float y = e.getY();
-
+		float x = e.getX() / getWidth();
+		final float xCoordinate = x - 0.5f;
+		float y = e.getY() / getHeight();
+		final float yCoordinate = (-y + 0.5f)*2;
+				
 		switch (e.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 
-				float dx = x - mPreviousX;
-				float dy = y - mPreviousY;
-				Log.i(TAG, dx + " " + dy + " " + mPreviousX + " " + mPreviousY);
-				// reverse direction of rotation above the mid-line
-				if (y < getHeight() / 2) {
-					dx = dx * -1;
-				}
+				Log.i(TAG, x + " " + y);
+				
+				queueEvent(new Runnable() {
 
-				// reverse direction of rotation to left of the mid-line
-				if (x > getWidth() / 2) {
-					dy = dy * -1;
-				}
-
-				block.setRotation( lastRotation = (lastRotation + 10) % 360);
-				// + ((dx + dy) * TOUCH_SCALE_FACTOR)); // = 180.0f / 320
-				requestRender();
-				Log.i(TAG, "Rotation set to " + lastRotation);
+					@Override
+					public void run() {
+						blockTest.setXCoordinate(xCoordinate);
+						blockTest.setYCoordinate(yCoordinate);
+					}
+				});
 		}
 
-		mPreviousX = x;
-		mPreviousY = y;
 		return true;
 	}
 }

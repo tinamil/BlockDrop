@@ -71,7 +71,7 @@ public class IBlock extends BlockObject {
 
 
 	@Override
-	public void regen() {
+	public void regenChild() {
 		super.regen();
 
 		vertexBuffer = initializeFloatBuffer(mLineCoords);
