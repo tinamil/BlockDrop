@@ -83,8 +83,8 @@ public class OBlock extends BlockObject {
 
 	}
 
-	public void draw(float[] viewMatrix, float[] projectionMatrix) {
-		super.draw(viewMatrix, projectionMatrix, mTextureCoordinateDataSize, mCubeTextureCoordinates,
+	public void draw(float[] viewProjectionMatrix) {
+		super.draw(viewProjectionMatrix, mTextureCoordinateDataSize, mCubeTextureCoordinates,
 				mTextureDataHandle, vertexBuffer, drawListBuffer, drawOrder.length,
 				GLES20.GL_TRIANGLES);
 	}

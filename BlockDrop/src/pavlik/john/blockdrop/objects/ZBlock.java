@@ -81,8 +81,8 @@ public class ZBlock extends BlockObject {
 		Log.i(TAG, "Initializing ZBlock");
 	}
 
-	public void draw(float[] viewMatrix, float[] projectionMatrix) {
-		super.draw(viewMatrix, projectionMatrix, mTextureCoordinateDataSize,
+	public void draw(float[] viewProjectionMatrix) {
+		super.draw(viewProjectionMatrix, mTextureCoordinateDataSize,
 				mLineTextureCoordinates, mTextureDataHandle, vertexBuffer, drawListBuffer,
 				mDrawOrder.length, GLES20.GL_TRIANGLE_STRIP);
 	}

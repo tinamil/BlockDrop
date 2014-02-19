@@ -68,15 +68,14 @@ public abstract class BlockObject {
 		return returnValue;
 	}
 
-	protected void draw(float[] viewMatrix, float[] projectionMatrix,
-			int mTextureCoordinateDataSize, FloatBuffer mTextureCoordinates,
-			int mTextureDataHandle, FloatBuffer vertexBuffer, ShortBuffer drawListBuffer,
-			int drawListBufferSize, int drawType) {
+	protected void draw(float[] viewProjectionMatrix, int mTextureCoordinateDataSize,
+			FloatBuffer mTextureCoordinates, int mTextureDataHandle, FloatBuffer vertexBuffer,
+			ShortBuffer drawListBuffer, int drawListBufferSize, int drawType) {
 
-		if(!initialized){
+		if (!initialized) {
 			regenChild();
 		}
-		
+
 		// Add program to OpenGL environment
 		GLES20.glUseProgram(mProgram);
 		MyRenderer.checkGlError("glUseProgram");
@@ -110,12 +109,12 @@ public abstract class BlockObject {
 		// This multiplies the view matrix by the model matrix, and stores the result in the MVP
 		// matrix
 		// (which currently contains model * view).
-		Matrix.multiplyMM(mMVPMatrix, 0, viewMatrix, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(mMVPMatrix, 0, viewProjectionMatrix, 0, mModelMatrix, 0);
 
 		// This multiplies the modelview matrix by the projection matrix, and stores the result in
 		// the MVP matrix
 		// (which now contains model * view * projection).
-		Matrix.multiplyMM(mMVPMatrix, 0, projectionMatrix, 0, mMVPMatrix, 0);
+		// Matrix.multiplyMM(mMVPMatrix, 0, projectionMatrix, 0, mMVPMatrix, 0);
 
 		// get handle to shape's transformation matrix
 		int mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
@@ -167,7 +166,7 @@ public abstract class BlockObject {
 		MyRenderer.checkGlError("glDisableVertexAttribArray");
 	}
 
-	public abstract void draw(float[] viewMatrix, float[] projectionMatrix);
+	public abstract void draw(float[] viewProjectionMatrix);
 
 	public synchronized void setRotation(int degrees) {
 		mRotationAngle = degrees;
@@ -197,5 +196,4 @@ public abstract class BlockObject {
 			Log.e(TAG, "Error linking shaders: " + GLES20.glGetProgramInfoLog(mProgram));
 		}
 	}
-
 }

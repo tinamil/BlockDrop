@@ -78,8 +78,8 @@ public class TBlock extends BlockObject {
 		Log.i(TAG, "Initializing TBlock");
 	}
 
-	public void draw(float[] viewMatrix, float[] projectionMatrix) {
-		super.draw(viewMatrix, projectionMatrix, mTextureCoordinateDataSize, mLineTextureCoordinates,
+	public void draw(float[] viewProjectionMatrix) {
+		super.draw(viewProjectionMatrix, mTextureCoordinateDataSize, mLineTextureCoordinates,
 				mTextureDataHandle, vertexBuffer, drawListBuffer, mDrawOrder.length,
 				GLES20.GL_TRIANGLE_STRIP);
 	}

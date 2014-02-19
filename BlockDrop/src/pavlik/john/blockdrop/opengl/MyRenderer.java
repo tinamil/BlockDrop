@@ -17,14 +17,13 @@ public class MyRenderer implements Renderer {
 
 	List<BlockObject>			mObjects			= new ArrayList<BlockObject>();
 	private static final String	TAG					= "MyRenderer";
-	// mMVPMatrix is an abbreviation for "Model View Projection Matrix"
-	private final float[]		mMVPMatrix			= new float[16];
+	private final float[]		mVPMatrix			= new float[16];
 	private final float[]		mProjectionMatrix	= new float[16];
 	private final float[]		mViewMatrix			= new float[16];
-	private Context				mContext;
+//	private Context				mContext;
 
 	public MyRenderer(Context context) {
-		this.mContext = context;
+//		this.mContext = context;
 	}
 
 	public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -39,13 +38,11 @@ public class MyRenderer implements Renderer {
 		// Redraw background color
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-		Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
 		// Calculate the projection and view transformation
-		//Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+		Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
 		for (BlockObject obj : mObjects) {
-			obj.draw(mViewMatrix, mProjectionMatrix);
+			obj.draw(mVPMatrix);
 		}
 	}
 
@@ -57,6 +54,8 @@ public class MyRenderer implements Renderer {
 		// this projection matrix is applied to object coordinates
 		// in the onDrawFrame() method
 		Matrix.orthoM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1f, 10f);
+		Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
 	}
 
 	/**

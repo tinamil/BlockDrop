@@ -50,8 +50,7 @@ public class JBlock extends BlockObject {
 														};
 
 	private final String	TAG							= this.getClass().getSimpleName();
-	static float			mVertexCoords[]				= { 
-			0.25f, 0.375f, 0.0f, // right top
+	static float			mVertexCoords[]				= { 0.25f, 0.375f, 0.0f, // right top
 			0.0f, 0.375f, 0.0f,// center top
 			0.25f, -0.125f, 0.0f, // Center right
 			0.25f, -0.375f, 0.0f, // right bottom
@@ -75,10 +74,10 @@ public class JBlock extends BlockObject {
 		Log.i(TAG, "Initializing JBlock");
 	}
 
-	public void draw(float[] viewMatrix, float[] projectionMatrix) {
-		super.draw(viewMatrix, projectionMatrix, mTextureCoordinateDataSize,
-				mLineTextureCoordinates, mTextureDataHandle, vertexBuffer, drawListBuffer,
-				mDrawOrder.length, GLES20.GL_TRIANGLE_STRIP);
+	public void draw(float[] viewProjectionMatrix) {
+		super.draw(viewProjectionMatrix, mTextureCoordinateDataSize, mLineTextureCoordinates,
+				mTextureDataHandle, vertexBuffer, drawListBuffer, mDrawOrder.length,
+				GLES20.GL_TRIANGLE_STRIP);
 	}
 
 	@Override
