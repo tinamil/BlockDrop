@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pavlik.john.blockdrop.objects;
+package pavlik.john.blockdrop.objects.blocktypes;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import pavlik.john.blockdrop.R;
 import pavlik.john.blockdrop.Util;
+import pavlik.john.blockdrop.objects.BlockObject;
+import pavlik.john.blockdrop.objects.World;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
@@ -77,8 +79,8 @@ public class OBlock extends BlockObject {
 	 * 
 	 * @param mContext
 	 */
-	public OBlock(Context mContext) {
-		super(mContext);
+	public OBlock(Context mContext, World world) {
+		super(mContext, world);
 		Log.i(TAG, "Initializing OBlock");
 
 	}
@@ -93,9 +95,9 @@ public class OBlock extends BlockObject {
 	@Override
 	public void regenChild() {
 		super.regen();
-		vertexBuffer = initializeFloatBuffer(squareCoords);
+		vertexBuffer = Util.initializeFloatBuffer(squareCoords);
 
-		drawListBuffer = initializeShortBuffer(drawOrder);
+		drawListBuffer = Util.initializeShortBuffer(drawOrder);
 
 		final int[] textureHandle = new int[1];
 		GLES20.glGenTextures(1, textureHandle, 0);
@@ -103,7 +105,7 @@ public class OBlock extends BlockObject {
 		// Load the texture
 		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.o);
 
-		mCubeTextureCoordinates = initializeFloatBuffer(cubeTextureCoordinateData);
+		mCubeTextureCoordinates = Util.initializeFloatBuffer(cubeTextureCoordinateData);
 	}
 
 }

@@ -1,10 +1,12 @@
-package pavlik.john.blockdrop.objects;
+package pavlik.john.blockdrop.objects.blocktypes;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import pavlik.john.blockdrop.R;
 import pavlik.john.blockdrop.Util;
+import pavlik.john.blockdrop.objects.BlockObject;
+import pavlik.john.blockdrop.objects.World;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
@@ -58,8 +60,8 @@ public class IBlock extends BlockObject {
 	 * @param mContext
 	 */
 
-	public IBlock(Context mContext) {
-		super(mContext);
+	public IBlock(Context mContext, World world) {
+		super(mContext, world);
 		Log.i(TAG, "Initializing IBlock");
 	}
 
@@ -74,8 +76,8 @@ public class IBlock extends BlockObject {
 	public void regenChild() {
 		super.regen();
 
-		vertexBuffer = initializeFloatBuffer(mLineCoords);
-		drawListBuffer = initializeShortBuffer(mDrawOrder);
+		vertexBuffer = Util.initializeFloatBuffer(mLineCoords);
+		drawListBuffer = Util.initializeShortBuffer(mDrawOrder);
 
 		final int[] textureHandle = new int[1];
 		GLES20.glGenTextures(1, textureHandle, 0);
@@ -83,6 +85,6 @@ public class IBlock extends BlockObject {
 		// Load the texture
 		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.i);
 
-		mLineTextureCoordinates = initializeFloatBuffer(mLineTextureCoordinateData);
+		mLineTextureCoordinates = Util.initializeFloatBuffer(mLineTextureCoordinateData);
 	}
 }

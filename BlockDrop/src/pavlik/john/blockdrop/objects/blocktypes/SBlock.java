@@ -1,18 +1,20 @@
-package pavlik.john.blockdrop.objects;
+package pavlik.john.blockdrop.objects.blocktypes;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import pavlik.john.blockdrop.R;
 import pavlik.john.blockdrop.Util;
+import pavlik.john.blockdrop.objects.BlockObject;
+import pavlik.john.blockdrop.objects.World;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
-public class JBlock extends BlockObject {
+public class SBlock extends BlockObject {
 
-	FloatBuffer				vertexBuffer;
-	ShortBuffer				drawListBuffer;
+	FloatBuffer		vertexBuffer;
+	ShortBuffer		drawListBuffer;
 
 	/** This will be used to pass in model texture coordinate information. */
 	int						mTextureCoordinateHandle;
@@ -24,7 +26,7 @@ public class JBlock extends BlockObject {
 	int						mTextureDataHandle;
 
 	/** Store our model data in a float buffer. */
-	FloatBuffer				mLineTextureCoordinates;
+	FloatBuffer		mLineTextureCoordinates;
 
 	int						mPositionHandle;
 	int						mMVPMatrixHandle;
@@ -39,27 +41,31 @@ public class JBlock extends BlockObject {
 	final float[]			mLineTextureCoordinateData	= {
 														// Front face
 
-			1.0f, 0.25f, // Top right
-			0.5f, 0.25f, // Center top
-			1.0f, 0.75f, // Center right
-			1.0f, 1.0f, // Bottom right
-			0.0f, 1.0f, // Bottom left
-			0.0f, 0.75f, // Left top
-			0.5f, 0.75f, // Center Middle
+			0.00f, 1.00f, // left bottom (0)
+			0.00f, 0.50f, // left middle (1)
+			0.25f, 0.50f, // center-left middle (2)
+			0.25f, 0.00f, // center-left top (3)
+			0.75f, 0.00f, // right top (4)
+			0.75f, 0.50f, // right middle (5)
+			0.50f, 0.50f, // Center-right middle (6)
+			0.50f, 1.00f, // center-right bottom (7)
 
 														};
 
 	private final String	TAG							= this.getClass().getSimpleName();
-	static float			mVertexCoords[]				= { 0.25f, 0.375f, 0.0f, // right top
-			0.0f, 0.375f, 0.0f,// center top
-			0.25f, -0.125f, 0.0f, // Center right
-			0.25f, -0.375f, 0.0f, // right bottom
-			-0.25f, -0.375f, 0.0f,// left bottom
-			-0.25f, -0.125f, 0.0f,// left top
-			0.0f, -0.125f, 0.0f,// center middle
+	static float			mVertexCoords[]				= {
+														// Vertex coordinates
+			-0.375f, -0.25f, 0.0f,// left bottom (0)
+			-0.375f, 0.00f, 0.0f,// left middle (1)
+			-0.125f, 0.00f, 0.0f,// center-left middle (2)
+			-0.125f, 0.25f, 0.0f,// center-left top (3)
+			0.375f, 0.25f, 0.0f, // right top (4)
+			0.375f, 0.00f, 0.0f,// right middle (5)
+			0.025f, 0.00f, 0.0f, // Center-right middle (6)
+			0.025f, -0.25f, 0.0f, // center-right bottom (7)
 														};
 
-	final short				mDrawOrder[]				= { 0, 1, 2, 6, 3, 4, 6, 5 };
+	final short				mDrawOrder[]				= { 1, 0, 2, 7, 6, 2, 3, 5, 4 };
 
 	float[]					mTranslationMatrix			= new float[16];
 
@@ -69,9 +75,10 @@ public class JBlock extends BlockObject {
 	 * @param mContext
 	 */
 
-	public JBlock(Context mContext) {
-		super(mContext);
-		Log.i(TAG, "Initializing JBlock");
+	public SBlock(Context mContext, World world) {
+		super(mContext, world);
+		Log.i(TAG, "Initializing SBlock");
+
 	}
 
 	public void draw(float[] viewProjectionMatrix) {
@@ -80,20 +87,21 @@ public class JBlock extends BlockObject {
 				GLES20.GL_TRIANGLE_STRIP);
 	}
 
+	
 	@Override
 	public void regenChild() {
 		super.regen();
 
-		vertexBuffer = initializeFloatBuffer(mVertexCoords);
-		drawListBuffer = initializeShortBuffer(mDrawOrder);
+		vertexBuffer = Util.initializeFloatBuffer(mVertexCoords);
+		drawListBuffer = Util.initializeShortBuffer(mDrawOrder);
 
 		final int[] textureHandle = new int[1];
 		GLES20.glGenTextures(1, textureHandle, 0);
 
 		// Load the texture
-		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.j);
+		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.s);
 
-		mLineTextureCoordinates = initializeFloatBuffer(mLineTextureCoordinateData);
+		mLineTextureCoordinates = Util.initializeFloatBuffer(mLineTextureCoordinateData);
 
 	}
 }

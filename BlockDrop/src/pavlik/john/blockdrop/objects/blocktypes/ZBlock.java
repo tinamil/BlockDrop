@@ -1,15 +1,18 @@
-package pavlik.john.blockdrop.objects;
+package pavlik.john.blockdrop.objects.blocktypes;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import pavlik.john.blockdrop.R;
 import pavlik.john.blockdrop.Util;
+import pavlik.john.blockdrop.objects.BlockObject;
+import pavlik.john.blockdrop.objects.World;
+import pavlik.john.blockdrop.opengl.MyRenderer;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
-public class TBlock extends BlockObject {
+public class ZBlock extends BlockObject {
 
 	FloatBuffer				vertexBuffer;
 	ShortBuffer				drawListBuffer;
@@ -29,6 +32,7 @@ public class TBlock extends BlockObject {
 	int						mPositionHandle;
 	int						mMVPMatrixHandle;
 
+
 	// S, T (or X, Y)
 	// Texture coordinate data.
 	// Because images have a Y axis pointing downward (values increase as you
@@ -39,31 +43,32 @@ public class TBlock extends BlockObject {
 	final float[]			mLineTextureCoordinateData	= {
 														// Front face
 
-			0.00f, 1.00f, // left bottom (0)
-			0.00f, 0.50f, // left middle (1)
-			0.25f, 0.50f, // center-left middle (2)
-			0.25f, 0.00f, // center-left top (3)
-			0.50f, 0.00f, // center-right top (4)
-			0.50f, 0.50f, // center-right middle (5)
-			0.75f, 0.50f, // right middle (6)
-			0.75f, 1.00f, // right bottom (7)
+			0.75f, 1.00f, // right bottom (0)
+			0.75f, 0.50f, // right middle (1)
+			0.50f, 0.50f, // center-right middle (2)
+			0.50f, 0.00f, // center-right top (3)
+			0.00f, 0.00f, // left top (4)
+			0.00f, 0.50f, // left middle (5)
+			0.25f, 0.50f, // Center-left middle (6)
+			0.25f, 1.00f, // center-left bottom (7)
 
 														};
 
 	private final String	TAG							= this.getClass().getSimpleName();
+
 	static float			mVertexCoords[]				= {
 														// Vertex coordinates
-			-1.50f, -0.50f, 0.0f,// left bottom (0)
-			-1.50f, 0.50f, 0.0f,// left middle (1)
-			-0.5f, 0.50f, 0.0f,// center-left middle (2)
-			-0.5f, 1.50f, 0.0f,// center-left top (3)
-			0.5f, 1.50f, 0.0f, // center-right top (4)
-			0.5f, 0.50f, 0.0f, // Center-right middle (5)
-			1.50f, 0.50f, 0.0f,// right middle (6)
-			1.50f, -0.50f, 0.0f, // Right bottom (7)
+			0.375f, -0.25f, 0.0f,// right bottom (0)
+			0.375f, 0.00f, 0.0f,// right middle (1)
+			0.025f, 0.00f, 0.0f,// center-right middle (2)
+			0.025f, 0.25f, 0.0f,// center-right top (3)
+			-0.375f, 0.25f, 0.0f, // left top (4)
+			-0.375f, 0.00f, 0.0f,// left middle (5)
+			-0.125f, 0.00f, 0.0f, // Center-left middle (6)
+			-0.125f, -0.25f, 0.0f, // center-left bottom (7)
 														};
 
-	final short				mDrawOrder[]				= { 1, 0, 5, 7, 6, 2, 5, 3, 4 };
+	final short				mDrawOrder[]				= { 1, 0, 2, 7, 6, 2, 3, 5, 4 };
 
 	float[]					mTranslationMatrix			= new float[16];
 
@@ -73,31 +78,30 @@ public class TBlock extends BlockObject {
 	 * @param mContext
 	 */
 
-	public TBlock(Context mContext) {
-		super(mContext);
-		Log.i(TAG, "Initializing TBlock");
+	public ZBlock(Context mContext, World world) {
+		super(mContext, world);
+		Log.i(TAG, "Initializing ZBlock");
 	}
 
 	public void draw(float[] viewProjectionMatrix) {
-		super.draw(viewProjectionMatrix, mTextureCoordinateDataSize, mLineTextureCoordinates,
-				mTextureDataHandle, vertexBuffer, drawListBuffer, mDrawOrder.length,
-				GLES20.GL_TRIANGLE_STRIP);
+		super.draw(viewProjectionMatrix, mTextureCoordinateDataSize,
+				mLineTextureCoordinates, mTextureDataHandle, vertexBuffer, drawListBuffer,
+				mDrawOrder.length, GLES20.GL_TRIANGLE_STRIP);
 	}
 
 	@Override
 	public void regenChild() {
 		super.regen();
-
-		vertexBuffer = initializeFloatBuffer(mVertexCoords);
-		drawListBuffer = initializeShortBuffer(mDrawOrder);
+		vertexBuffer = Util.initializeFloatBuffer(mVertexCoords);
+		drawListBuffer = Util.initializeShortBuffer(mDrawOrder);
 
 		final int[] textureHandle = new int[1];
 		GLES20.glGenTextures(1, textureHandle, 0);
+		MyRenderer.checkGlError("glGenTextures");
 
 		// Load the texture
-		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.t);
+		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.z);
 
-		mLineTextureCoordinates = initializeFloatBuffer(mLineTextureCoordinateData);
-
+		mLineTextureCoordinates = Util.initializeFloatBuffer(mLineTextureCoordinateData);
 	}
 }

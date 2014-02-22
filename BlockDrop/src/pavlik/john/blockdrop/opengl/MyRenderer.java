@@ -7,6 +7,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import pavlik.john.blockdrop.objects.BlockObject;
+import pavlik.john.blockdrop.objects.World;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -20,10 +21,13 @@ public class MyRenderer implements Renderer {
 	private final float[]		mVPMatrix			= new float[16];
 	private final float[]		mProjectionMatrix	= new float[16];
 	private final float[]		mViewMatrix			= new float[16];
-//	private Context				mContext;
+	private World				mWorld;
 
-	public MyRenderer(Context context) {
-//		this.mContext = context;
+	// private Context mContext;
+
+	public MyRenderer(Context context, World world) {
+		// this.mContext = context;
+		mWorld = world;
 	}
 
 	public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -55,7 +59,7 @@ public class MyRenderer implements Renderer {
 		// in the onDrawFrame() method
 		Matrix.orthoM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1f, 10f);
 		Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
+		mWorld.setRatio(ratio);
 	}
 
 	/**
@@ -82,6 +86,14 @@ public class MyRenderer implements Renderer {
 	public void addBlock(BlockObject block) {
 		block.regenChild();
 		mObjects.add(block);
+	}
+
+	public void setWorld(World world) {
+		this.mWorld = world;
+	}
+
+	public float[] getViewProjectionMatrix() {
+		return mVPMatrix;
 	}
 
 }

@@ -1,7 +1,8 @@
 package pavlik.john.blockdrop;
 
 import pavlik.john.blockdrop.objects.BlockObject;
-import pavlik.john.blockdrop.objects.OBlock;
+import pavlik.john.blockdrop.objects.World;
+import pavlik.john.blockdrop.objects.blocktypes.OBlock;
 import pavlik.john.blockdrop.opengl.MyGLSurfaceView;
 import android.app.Activity;
 import android.os.Bundle;
@@ -88,8 +89,14 @@ public class MainActivity extends Activity {
 	private void startGame() {
 		// startTime = SystemClock.uptimeMillis();
 		timeHandler.postDelayed(updateTimerThread, 0);
-		block = new OBlock(getApplicationContext());
+		block = new OBlock(getApplicationContext(), new World(getApplicationContext()));
 		mSurfaceView.addBlock(block);
+		totalCycles = 20;
+		mSurfaceView.queueEvent(new Runnable() {
+			public void run() {
+				block.setYBlock(20);
+			};
+		});
 
 		startButton.setVisibility(View.GONE);
 		mTopOverlay.setVisibility(View.GONE);
@@ -103,6 +110,7 @@ public class MainActivity extends Activity {
 		pauseButton.setVisible(false);
 	}
 
+	int					totalCycles			= 20;
 	private Runnable	updateTimerThread	= new Runnable() {
 												public void run() {
 													long timeInMilliseconds = SystemClock
@@ -111,12 +119,23 @@ public class MainActivity extends Activity {
 													// int secs = (int) (timeInMilliseconds / 1000);
 													// int mins = secs / 60;
 													// secs = secs % 60;
-													int milliseconds = (int) (timeInMilliseconds % 1000);
+													if (timeInMilliseconds > 500) {
+														totalCycles -= 1;
+														startTime = SystemClock.uptimeMillis();
+														mSurfaceView.queueEvent(new Runnable() {
+															public void run() {
+																int yBlock = block.getYBlock() - 1;
+																block.setYBlock(yBlock);
+															};
+														});
+													}
 													Log.d(TAG, "Timer posted");
 													// timerValue.setText("" + mins + ":"
 													// + String.format("%02d", secs) + ":"
 													// + String.format("%03d", milliseconds));
-													timeHandler.postDelayed(this, 1000);
+													if (totalCycles > 0) {
+														timeHandler.postDelayed(this, 250);
+													}
 												}
 											};
 

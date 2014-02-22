@@ -11,63 +11,78 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-public abstract class BlockObject {
-
-	private final String		TAG					= this.getClass().getSimpleName();
+public class World {
+	private final String		TAG							= this.getClass().getSimpleName();
 	protected int				mProgram;
 
-	private transient int		mRotationAngle		= 0;
-	private float				xCoordinate			= 0;
-	private float				yCoordinate			= 0;
+	private final int			maxHeight					= 20;
+	private final int			minHeight					= 0;
+	private final float			minYCoordinate				= -.5f;
+	private final float			maxYCoordinate				= .5f;
+	private final float			yRange						= maxYCoordinate - minYCoordinate;
+	private final float			heightRange					= maxHeight - minHeight;
 
-	private boolean				initialized			= false;
+	private final int			leftLimit					= 0;
+	private final int			rightLimit					= 10;
+	private float				minXCoordinate				= -.5f;
+	private float				maxXCoordinate				= .5f;
+	private final float			xRange						= maxXCoordinate - minXCoordinate;
+	private final float			widthRange					= rightLimit - leftLimit;
+
+	private final float			mRotationAngle				= 0f;
+	private final float			xCoordinate					= 0f;
+	private final float			yCoordinate					= 0f;
 
 	// number of coordinates per vertex in this array
-	protected static final int	COORDS_PER_VERTEX	= 3;
+	protected static final int	COORDS_PER_VERTEX			= 3;
 
-	protected final Context		mContext;
+	private FloatBuffer			vertexBuffer;
+	private ShortBuffer			drawListBuffer;
 
-	World						mWorld;
+	/** Size of the texture coordinate data in elements. */
+	private final int			mTextureCoordinateDataSize	= 2;
 
-	public BlockObject(Context mContext, World world) {
+	/** This is a handle to our texture data. */
+	private int					mTextureDataHandle;
+
+	/** Store our model data in a float buffer. */
+	private FloatBuffer			mTextureCoordinates;
+
+	// S, T (or X, Y)
+	// Texture coordinate data.
+	// Because images have a Y axis pointing downward (values increase as you
+	// move down the image) while
+	// OpenGL has a Y axis pointing upward, we adjust for that here by flipping
+	// the Y axis.
+	// What's more is that the texture coordinates are the same for every face.
+	final float[]				mLineTextureCoordinateData	= {
+															// Front face
+			0.0f, 0.0f, // Bottom left
+			0.0f, 1.0f, // Top Left
+			1.0f, 1.0f, // Top right
+			1.0f, 0.0f										// Bottom right
+															};
+
+	static float				mLineCoords[]				= { -0.125f, 0.5f, 0.0f, // top left
+			-0.125f, -0.5f, 0.0f, // bottom left
+			0.125f, -0.5f, 0.0f, // bottom right
+			0.125f, 0.5f, 0.0f								};									// top
+	// right
+
+	private final short			mDrawOrder[]				= { 0, 2, 3, 0, 1, 2 };			// order
+																								// to
+																								// draw
+																								// vertices
+
+	float[]						mTranslationMatrix			= new float[16];
+
+	private final Context		mContext;
+
+	public World(Context mContext) {
 		this.mContext = mContext;
-		this.mWorld = world;
 	}
 
-	public void setYBlock(int yBlock) {
-		Log.i(TAG, "Setting yBlock to " + yBlock);
-		if (yBlock > mWorld.getMaxHeight() || yBlock < mWorld.getMinHeight()) {
-			return;
-		}
-		setYCoordinate(mWorld.translateYBlock(yBlock));
-	}
-
-	public void setXBlock(int xBlock) {
-		Log.i(TAG, "Setting xBlock to " + xBlock);
-		if (xBlock > mWorld.getRightLimit() || xBlock < mWorld.getLeftLimit()) {
-			return;
-		}
-		setXCoordinate(mWorld.translateXBlock(xBlock));
-	}
-
-	private void setXCoordinate(float xCoordinate) {
-		Log.i(TAG, "Setting xCoordinate to " + xCoordinate);
-		this.xCoordinate = xCoordinate;
-	}
-
-	private void setYCoordinate(float yCoordinate) {
-		Log.i(TAG, "Setting yCoordinate to " + yCoordinate);
-		this.yCoordinate = yCoordinate;
-	}
-
-	protected void draw(float[] viewProjectionMatrix, int mTextureCoordinateDataSize,
-			FloatBuffer mTextureCoordinates, int mTextureDataHandle, FloatBuffer vertexBuffer,
-			ShortBuffer drawListBuffer, int drawListBufferSize, int drawType) {
-
-		if (!initialized) {
-			regenChild();
-		}
-
+	protected void draw(float[] viewProjectionMatrix) {
 		// Add program to OpenGL environment
 		GLES20.glUseProgram(mProgram);
 		MyRenderer.checkGlError("glUseProgram");
@@ -149,7 +164,7 @@ public abstract class BlockObject {
 		MyRenderer.checkGlError("glVertexAttribPointer");
 
 		// Draw the object
-		GLES20.glDrawElements(drawType, drawListBufferSize, GLES20.GL_UNSIGNED_SHORT,
+		GLES20.glDrawElements(GLES20.GL_TRIANGLES, mDrawOrder.length, GLES20.GL_UNSIGNED_SHORT,
 				drawListBuffer);
 		MyRenderer.checkGlError("glDrawElements");
 
@@ -158,17 +173,9 @@ public abstract class BlockObject {
 		MyRenderer.checkGlError("glDisableVertexAttribArray");
 	}
 
-	public abstract void draw(float[] viewProjectionMatrix);
-
-	public void setRotation(int degrees) {
-		mRotationAngle = degrees;
-	}
-
-	public abstract void regenChild();
-
 	protected void regen() {
 		Log.i(TAG, "Regenerating block textures and data");
-		initialized = true;
+
 		// prepare shaders and OpenGL program
 		int vertexShader = Util.compileShader(GLES20.GL_VERTEX_SHADER, Util
 				.readTextFileFromRawResource(mContext, R.raw.vertshader));
@@ -181,19 +188,80 @@ public abstract class BlockObject {
 		GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment
 															// shader to program
 		GLES20.glLinkProgram(mProgram); // create OpenGL program executables
+
 		// Get the compilation status.
 		final int[] compileStatus = new int[1];
 		GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, compileStatus, 0);
 		if (compileStatus[0] == 0) {
 			Log.e(TAG, "Error linking shaders: " + GLES20.glGetProgramInfoLog(mProgram));
 		}
+
+		vertexBuffer = Util.initializeFloatBuffer(mLineCoords);
+		drawListBuffer = Util.initializeShortBuffer(mDrawOrder);
+
+		final int[] textureHandle = new int[1];
+		GLES20.glGenTextures(1, textureHandle, 0);
+
+		// Load the texture
+		mTextureDataHandle = Util.loadTexture(mContext, R.drawable.i);
+
+		mTextureCoordinates = Util.initializeFloatBuffer(mLineTextureCoordinateData);
 	}
 
-	public int getYBlock() {
-		return mWorld.translateYCoordinate(yCoordinate);
+	private float getHeightRange() {
+		return heightRange;
 	}
 
-	public int getXBlock() {
-		return mWorld.translateXCoordinate(xCoordinate);
+	private float getYRange() {
+		return yRange;
+	}
+
+	int getMaxHeight() {
+		return maxHeight;
+	}
+
+	int getMinHeight() {
+		return minHeight;
+	}
+
+	int getRightLimit() {
+		return rightLimit;
+	}
+
+	int getLeftLimit() {
+		return leftLimit;
+	}
+
+	private float getXRange() {
+		return xRange;
+	}
+
+	private float getWidthRange() {
+		return widthRange;
+	}
+
+	public void setRatio(float ratio) {
+		minXCoordinate = -ratio;
+		maxXCoordinate = ratio;
+	}
+
+	public int translateYCoordinate(float yCoordinate) {
+		final float yBlock = (yCoordinate + getYRange() / 2.0f) * getHeightRange() * getYRange();
+		return Math.round(yBlock);
+	}
+
+	public int translateXCoordinate(float xCoordinate) {
+		final float xBlock = (xCoordinate + getXRange() / 2.0f) * getWidthRange() * getXRange();
+		return Math.round(xBlock);
+	}
+
+	public float translateYBlock(int yBlock) {
+		float yRange = getYRange();
+		return (yBlock * 1.0f / getHeightRange() * yRange) - yRange / 2.0f;
+	}
+
+	public float translateXBlock(int xBlock) {
+		float xRange = getXRange();
+		return (xBlock * 1.0f / getWidthRange() * xRange) - xRange / 2.0f;
 	}
 }
