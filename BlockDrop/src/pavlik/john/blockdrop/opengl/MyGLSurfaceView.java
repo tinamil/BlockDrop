@@ -59,7 +59,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
 				Log.i(TAG, "Touched world at " + worldCoords[0] + " " + worldCoords[1]);
 				final int xChange = xWorld > 0f ? 1 : -1;
 				queueEvent(new Runnable() {
-
 					@Override
 					public void run() {
 						blockTest.setXBlock(blockTest.getXBlock() + xChange);
